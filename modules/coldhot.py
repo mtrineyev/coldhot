@@ -13,6 +13,7 @@ ColdHotGame bot v1.1 (c) 2020 Maksym Trineyev
 mtrineyev@gmail.com
 """
 
+from datetime import datetime
 import random
 
 import config
@@ -37,15 +38,20 @@ class ColdHotGame(object):
 
 
     def __enter__(self):
-        print('Bot started and waiting for user input...')
+        print(self._now(), 'Bot started and waiting for user input...')
         return self
 
 
     def __exit__(self, type, value, tb):
         self.user.exit()
-        print('Bot stopped')
+        print(self._now(), 'Bot stopped')
 
 
+    def _now(self, end='\n') -> str:
+        """To return current data/time string"""
+        return f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}]'
+        
+        
     def _distanse(self, a: int, b: int, hard=False) -> str:
         """Returns word expression of distanse"""
         d = abs(a - b)
@@ -265,7 +271,7 @@ class ColdHotGame(object):
             if 'text' in update['message']:
                 self.user_input = update['message']['text']\
                     .lower().strip('/')
-                print(self.user.name, '->', self.user_input)
+                print(self.user.name, '-->', self.user_input)
                 self._proceed_text()
             else:
                 self._idle()
