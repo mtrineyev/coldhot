@@ -271,7 +271,7 @@ class ColdHotGame(object):
             if 'text' in update['message']:
                 self.user_input = update['message']['text']\
                     .lower().strip('/')
-                print(self.user.name, '-->', self.user_input)
+                print(self._now(), self.user.name, '-->', self.user_input)
                 self._proceed_text()
             else:
                 self._idle()
