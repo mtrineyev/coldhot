@@ -259,6 +259,8 @@ class ColdHotGame(object):
     def listen(self) -> None:
         """Receives updates from the bot and acts"""
         data = tg.get_updates(self.last_update_id + 1)
+        if not data:
+            return
         
         for update in data['result']:
             self._get_update_info(update)
