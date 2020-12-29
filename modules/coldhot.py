@@ -90,10 +90,11 @@ class ColdHotGame(object):
         """Converts seconds to the string from hours, minutes and seconds"""
         m, s = divmod(elapsed, 60)
         h, m = divmod(m, 60)
-        result = self._plural(h, msg.hours) + ', '
-        result += self._plural(m, msg.minutes) + ' та '
-        result += self._plural(s, msg.seconds)
-        result = result.strip(', ').strip(' та ')
+        result = self._plural(h, msg.hours) +\
+            (', ' if h and m else '') +\
+            self._plural(m, msg.minutes) +\
+            (' та ' if (m or h) and s else '') +\
+            self._plural(s, msg.seconds)
         return result
 
     
