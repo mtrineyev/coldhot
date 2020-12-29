@@ -39,7 +39,8 @@ def get_updates(offset: int) -> dict:
 def send_message(chat_id: int, text: str, parse_mode='markdown') -> str:
     """Send text to chat_id and returns True if succes"""
     result = requests.get(f'{config.TG_API}/sendMessage',
-        params={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode}).ok
+        params={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode}
+        ).ok
     return result
 
 
