@@ -31,6 +31,8 @@ class ColdHotGame(object):
     The user guesses the number by getting hints from the bot.
     """
     def __init__(self):
+        if not config.TOKEN:
+            exit('No TOKEN provided')
         self.last_update_id = 0
         self.user_input = ''
         self.update_time = 0
@@ -219,9 +221,11 @@ class ColdHotGame(object):
         tg.send_message(self.user.id, message)
 
 
-    def _get_update_info(self, update: dict) -> None:
+    def _get_update_info(self, update: dict) -> bool:
         """Saves received update info to the class variables"""
         self.last_update_id = update['update_id']
+        if not update.get('message'):
+            return False
         self.user.id = update['message']['chat']['id']
         if 'username' in update['message']['from']:
             self.user.nick = update['message']['from']['username']
@@ -232,10 +236,13 @@ class ColdHotGame(object):
         else:
             self.user.name = ''
         self.update_time = update['message']['date']
+        return True
     
     
-    def _proceed_text(self) -> None:
+    def _proceed(self, text: str) -> None:
         """Analizes text command from user and acts"""
+        self.user_input = text.lower().strip('/')
+        print(self._now(), self.user.name, '-->', self.user_input)
         if self.user_input in commands.helping:
             self._help()
         elif self.user_input in commands.leaders:
@@ -264,7 +271,8 @@ class ColdHotGame(object):
             return
         
         for update in data['result']:
-            self._get_update_info(update)
+            if not self._get_update_info(update):
+                return
 
             if not self.user.read():
                 self.user.create()
@@ -272,10 +280,7 @@ class ColdHotGame(object):
                 tg.send_message(self.user.id, message)
             
             if 'text' in update['message']:
-                self.user_input = update['message']['text']\
-                    .lower().strip('/')
-                print(self._now(), self.user.name, '-->', self.user_input)
-                self._proceed_text()
+                self._proceed(update['message']['text'])
             else:
                 self._idle()
 
