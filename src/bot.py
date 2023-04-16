@@ -15,11 +15,11 @@ import telebot
 from settings import BOT_TOKEN, MAX_GUESS_NUMBER
 from src.thesaurus.commands import LEADERS, HELP, STOP, STATS, HARD, START
 from src.thesaurus.messages import (
-    ABORT_GAME, END_GAME, ERRORS, EXCLAMATION,
+    ABORT_GAME, END_GAME, ERRORS, EXCLAMATION, START_GAME_OTHER_CHAT,
     GAME_ALREADY_STARTED, HELLO, HELP_IN_GAME, HELP_OUT_GAME, HINTS,
     NO_GAME_STARTED, RECORD_HEADER, RECORD_TIME, RECORD_STEPS, GAME_TYPE,
     RECORD_FOOTER, REPLIES, START_GAME, STICKER_REPLY,
-    STATS_TITLE, STATS_NO_GAMES, STATS_NORMAL, STATS_HARD,
+    STATS_TITLE, STATS_NO_GAMES, STATS_NORMAL, STATS_HARD, STATS_OTHER_CHAT,
     LEADERS_TABLE, MEDALS,
 )
 from src.players import Players
@@ -37,21 +37,23 @@ players.load()
 @bot.message_handler(commands=START+HARD)
 def start_game(message) -> None:
     user = message.from_user
+    name = f"{user.first_name} {user.last_name}"
+    if message.chat.id != user.id:
+        bot.send_message(message.chat.id, START_GAME_OTHER_CHAT.format(name))
     if not players.is_exist(user.id):
-        name = " ".join([user.first_name, user.last_name])
         players.add_new(user.id, name)
-        bot.send_message(message.chat.id, HELLO.format(name))
+        bot.send_message(user.id, HELLO.format(name))
         players.save()
     player = players[user.id]
     if player.is_game_started():
         bot.send_message(
-            message.chat.id, GAME_ALREADY_STARTED.format(
+            user.id, GAME_ALREADY_STARTED.format(
                 seconds_to_ua(message.date - player.start_time)))
         return
     hard_mode = message.text.strip("/") in HARD
     player.init_game(
         random.randint(1, MAX_GUESS_NUMBER), message.date, hard_mode)
-    bot.send_message(message.chat.id, START_GAME.format(MAX_GUESS_NUMBER))
+    bot.send_message(user.id, START_GAME.format(MAX_GUESS_NUMBER))
     logging.info(
         "Game started "
         f"{player.name=}, {player.hard_mode=}, {player.number_to_guess=}")
@@ -81,6 +83,10 @@ def help_command(message) -> None:
 @bot.message_handler(commands=STATS)
 def stats_command(message) -> None:
     user = message.from_user
+    if user.id != message.chat.id:
+        bot.send_message(
+            message.chat.id,
+            STATS_OTHER_CHAT.format(message.from_user.first_name))
     if players.was_games_played(user.id):
         player = players[user.id]
         stats = STATS_TITLE
@@ -96,7 +102,7 @@ def stats_command(message) -> None:
                 seconds_to_ua(player.best_time_hard))
     else:
         stats = STATS_NO_GAMES
-    bot.send_message(message.chat.id, stats)
+    bot.send_message(user.id, stats)
 
 
 @bot.message_handler(commands=LEADERS)
@@ -127,11 +133,11 @@ def make_move(message):
         try:
             guess = int(message.text)
         except ValueError:
-            bot.send_message(message.chat.id, random.choice(ERRORS))
+            bot.send_message(user.id, random.choice(ERRORS))
             return
         if guess == player.number_to_guess:
             elapsed_time = message.date - player.start_time
-            notification = END_GAME.format(
+            relpy = END_GAME.format(
                 get_plural_word(player.steps_count, STEPS),
                 seconds_to_ua(elapsed_time))
             record = ""
@@ -143,21 +149,21 @@ def make_move(message):
             player.reset_game()
             players.save()
             if record:
-                notification += EXCLAMATION + record + RECORD_FOOTER
+                relpy += EXCLAMATION + record + RECORD_FOOTER
             logging.info(f"{player.name=} guessed the number {elapsed_time=}")
         else:
             hint = HINTS[get_hit_index(guess, player.number_to_guess)]
-            notification = hint[-player.hard_mode:]  # last symbol if hard
+            relpy = hint[-player.hard_mode:]  # last symbol if hard
     else:
-        notification = random.choice(REPLIES)
-    bot.send_message(message.chat.id, notification)
+        relpy = random.choice(REPLIES)
+    bot.send_message(user.id, relpy)
 
 
 @bot.message_handler(content_types=[
     "audio", "document", "photo", "sticker",
     "video", "voice", "location", "contact"])
 def message_reply(message):
-    bot.send_message(message.chat.id, STICKER_REPLY)
+    bot.send_message(message.from_user.id, STICKER_REPLY)
 
 
 if __name__ == '__main__':
