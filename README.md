@@ -1,19 +1,21 @@
-# ColdHot Telegram bot game
+# ColdHot Telegram bot game v3.0
 "Guess the Number" telegram game by Cold-Hot method ❄️☀️ by @mtrineyev
 
-Live bot @ColdHotGameBot
+Telegram bot https://t.me/ColdHotGameBot
 
 ## Deployment and running
-```
+```bash
 cd <install directory>
 git clone git@github.com:mtrineyev/coldhot.git
 cd coldhot
-echo token=\'your_bot_token_here\' > ./modules/prod.py
-python3 app.py
+python3 -m venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp settings.example settings.py
+nano settings.py
+python main.py
 ```
 
-Application uses `requests`, `random` and `sqlite3`  Python3 modules
-
-Users database will be auto created in the `bot/modules` directory
+Application uses `pyTelegramBotAPI` Python module
 
 Have a nice game :)

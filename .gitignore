@@ -1,4 +1,5 @@
 __pycache__
+.idea/
 .vscode
-prod.py
-coldhot.db
+settings.py
+*.pickle

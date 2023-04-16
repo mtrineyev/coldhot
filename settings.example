@@ -1,0 +1,27 @@
+"""
+Settings of the project
+
+Constants:
+
+    BOT_TOKEN - Telegram bot token received from @BotFather
+    PLAYERS_FILE_NAME - name of the file with users database
+    MAX_NUMBER - upper limit for guessed number (recommended >= 501)
+
+ColdHotGame bot v3.0 (c) 2020-2023 Maksym Trineiev
+mtrineyev@gmail.com
+"""
+
+import logging
+logging.basicConfig(
+    # filename='coldhot.log',
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    level=logging.INFO
+)
+
+BOT_TOKEN = "1234567890:AABB11cc22DD33ee44FF55gg66HH77ii88J"
+PLAYERS_FILE_NAME = 'players.pickle'
+MAX_GUESS_NUMBER = 1000
+
+
+if __name__ == "__main__":
+    print(__doc__)
