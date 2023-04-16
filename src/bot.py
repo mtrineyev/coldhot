@@ -50,7 +50,7 @@ def start_game(message) -> None:
             user.id, GAME_ALREADY_STARTED.format(
                 seconds_to_ua(message.date - player.start_time)))
         return
-    hard_mode = message.text.strip("/") in HARD
+    hard_mode = any([c in message.text for c in HARD])
     player.init_game(
         random.randint(1, MAX_GUESS_NUMBER), message.date, hard_mode)
     bot.send_message(user.id, START_GAME.format(MAX_GUESS_NUMBER))
@@ -131,9 +131,9 @@ def make_move(message):
         player = players[user.id]
         player.steps_count += 1
         try:
-            guess = int(message.text)
+            guess = int(message.text.lstrip("/"))
         except ValueError:
-            bot.send_message(user.id, random.choice(ERRORS))
+            bot.send_message(message.chat.id, random.choice(ERRORS))
             return
         if guess == player.number_to_guess:
             elapsed_time = message.date - player.start_time
@@ -150,13 +150,13 @@ def make_move(message):
             players.save()
             if record:
                 relpy += EXCLAMATION + record + RECORD_FOOTER
-            logging.info(f"{player.name=} guessed the number {elapsed_time=}")
+            logging.info(f"{player.name=} guessed the number, {elapsed_time=}")
         else:
             hint = HINTS[get_hit_index(guess, player.number_to_guess)]
             relpy = hint[-player.hard_mode:]  # last symbol if hard
     else:
         relpy = random.choice(REPLIES)
-    bot.send_message(user.id, relpy)
+    bot.send_message(message.chat.id, relpy)
 
 
 @bot.message_handler(content_types=[
