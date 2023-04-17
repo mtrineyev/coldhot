@@ -37,7 +37,8 @@ players.load()
 @bot.message_handler(commands=START+HARD)
 def start_game(message) -> None:
     user = message.from_user
-    name = f"{user.first_name} {user.last_name}"
+    last_name = f" {user.last_name}" if user.last_name else ""
+    name = f"{user.first_name}{last_name}"
     if message.chat.id != user.id:
         bot.send_message(message.chat.id, START_GAME_OTHER_CHAT.format(name))
     if not players.is_exist(user.id):
