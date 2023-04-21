@@ -48,10 +48,10 @@ import pickle
 
 from settings import PLAYERS_FILE_NAME
 
+_INFINITY = 9223372036854775807
+
 
 class Player:
-    _INFINITY = 9223372036854775807
-
     def __init__(self, name: str) -> None:
         self.name = name
         self.number_to_guess = 0
@@ -59,11 +59,11 @@ class Player:
         self.hard_mode = False
         self.steps_count = 0
         self.games_played = 0
-        self.best_time = self._INFINITY
-        self.best_steps = self._INFINITY
+        self.best_time = _INFINITY
+        self.best_steps = _INFINITY
         self.games_played_hard = 0
-        self.best_time_hard = self._INFINITY
-        self.best_steps_hard = self._INFINITY
+        self.best_time_hard = _INFINITY
+        self.best_steps_hard = _INFINITY
 
     def __str__(self) -> str:
         return json.dumps(self.__dict__, indent=2, ensure_ascii=False)
@@ -140,28 +140,32 @@ class Players:
 
     def get_top3_steps(self) -> list:
         top = sorted(
-            [(v.name, v.best_steps) for v in self._players.values()],
+            [(v.name, v.best_steps) for v in self._players.values()
+             if v.best_steps != _INFINITY],
             key=lambda x: x[1]
         )
         return top[:3]
 
     def get_top3_time(self) -> list:
         top = sorted(
-            [(v.name, v.best_time) for v in self._players.values()],
+            [(v.name, v.best_time) for v in self._players.values()
+             if v.best_time != _INFINITY],
             key=lambda x: x[1]
         )
         return top[:3]
 
     def get_top3_hard_steps(self) -> list:
         top = sorted(
-            [(v.name, v.best_steps_hard) for v in self._players.values()],
+            [(v.name, v.best_steps_hard) for v in self._players.values()
+             if v.best_steps_hard != _INFINITY],
             key=lambda x: x[1]
         )
         return top[:3]
 
     def get_top3_hard_time(self) -> list:
         top = sorted(
-            [(v.name, v.best_time_hard) for v in self._players.values()],
+            [(v.name, v.best_time_hard) for v in self._players.values()
+             if v.best_time_hard != _INFINITY],
             key=lambda x: x[1]
         )
         return top[:3]
