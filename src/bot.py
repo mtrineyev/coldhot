@@ -76,9 +76,11 @@ def stop_command(message) -> None:
 def help_command(message) -> None:
     user = message.from_user
     if players.is_game_started(user.id):
-        bot.send_message(message.chat.id, HELP_IN_GAME)
+        bot.send_message(
+            message.chat.id, HELP_IN_GAME.format("\n".join(HINTS[3:])))
     else:
-        bot.send_message(message.chat.id, HELP_OUT_GAME)
+        bot.send_message(
+            message.chat.id, HELP_OUT_GAME.format(MAX_GUESS_NUMBER))
 
 
 @bot.message_handler(commands=STATS)
