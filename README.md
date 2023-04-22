@@ -15,15 +15,15 @@ source venv/bin/activate
 pip install -r requirements.txt
 cp settings.example settings.py
 nano settings.py
-python main.py
+python coldhot.py
 ```
 You can also start the bot in background:
 ```bash
-nohup python main.py > /dev/null 2>&1&
+nohup python coldhot.py > /dev/null 2>&1&
 ```
 You can find the process and its process ID with this command:
 ```bash
-ps ax | grep main.py
+ps ax | grep coldhot.py
 ```
 If you want to stop the execution, you can kill it with the kill command:
 ```bash
