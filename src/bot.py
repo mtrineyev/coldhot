@@ -24,8 +24,12 @@ from src.thesaurus.messages import (
 )
 from src.players import Players
 from src.utils import (
-    get_hit_index, get_plural_word, seconds_to_ua,
-    GAMES, STEPS,
+    GAMES,
+    STEPS,
+    get_hit_index,
+    get_plural_word,
+    seconds_to_ua,
+    escape_markdown,
 )
 
 
@@ -40,7 +44,7 @@ def start_game(message) -> None:
     last_name = f" {user.last_name}" if user.last_name else ""
     name = f"{user.first_name}{last_name}"
     if message.chat.id != user.id:
-        bot.send_message(message.chat.id, START_GAME_OTHER_CHAT.format(name))
+        bot.send_message(message.chat.id, START_GAME_OTHER_CHAT.format(escape_markdown(name)))
     if not players.is_exist(user.id):
         players.add_new(user.id, name)
         bot.send_message(user.id, HELLO.format(name))
@@ -89,7 +93,7 @@ def stats_command(message) -> None:
     if user.id != message.chat.id:
         bot.send_message(
             message.chat.id,
-            STATS_OTHER_CHAT.format(message.from_user.first_name))
+            STATS_OTHER_CHAT.format(escape_markdown(message.from_user.first_name)))
     if players.was_games_played(user.id):
         player = players[user.id]
         stats = STATS_TITLE
@@ -113,7 +117,7 @@ def leaders_command(message) -> None:
     def top3(rows: list, func, plurals=()) -> str:
         result = ""
         for i, (name, value) in enumerate(rows):
-            result += f"{MEDALS[i]} {name} {func(value, plurals)}\n"
+            result += f"{MEDALS[i]} {escape_markdown(name)} {func(value, plurals)}\n"
         return result
 
     bot.send_message(message.chat.id, LEADERS_TABLE.format(
